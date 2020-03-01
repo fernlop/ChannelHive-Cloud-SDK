@@ -1,0 +1,14 @@
+{
+  "name": "channelhive-cloud-sdk",
+  "version": "1.0.0",
+  "description": "Wrapper for Cloud SDKs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marvin Baum",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.628.0"
+  }
+}
