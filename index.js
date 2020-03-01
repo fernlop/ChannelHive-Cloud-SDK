@@ -10,6 +10,7 @@ module.exports = class services {
         this.region = settings.region;
 
         this.database = new platforms[this.platform].database(regions[this.platform][this.region])
+        this.func = new platforms[this.platform].func()
     }
     RES = (body, statusCode) => ({
         statusCode: statusCode || (body ? 200 : 204),
