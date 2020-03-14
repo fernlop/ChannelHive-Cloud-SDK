@@ -9,8 +9,9 @@ module.exports = class services {
         this.platform = settings.platform;
         this.region = settings.region;
 
-        this.database = new platforms[this.platform].database(regions[this.platform][this.region])
-        this.func = new platforms[this.platform].func()
+        this.database = new platforms[this.platform].database(regions[this.platform][this.region]);
+        this.func = new platforms[this.platform].func();
+        this.store = new platforms[this.platform].store();
     }
     RES = (body, statusCode) => ({
         statusCode: statusCode || (body ? 200 : 204),

@@ -34,19 +34,23 @@ module.exports = class dynamoDB {
         let params = {
             TableName,
             Key,
-            AttributeUpdates,
+            AttributeUpdates: {},
             Expected: Expected && {
                 ComparisonOperator: Expected.operator, 
                 AttributeValueList: Array.isArray(Expected.value) ? [Expected.value] : [[Expected.value]]
             }
         };
-        Object.keys(UpdateAttributes).forEach(key => (typeof key === "object" && Object.keys(key).length > 0) ?
-            params.AttributeUpdates[key] = {
-                Action: UpdateAttributes[key].action, 
-                Value: UpdateAttributes[key].value
+        Object.keys(UpdateAttributes).forEach(key => {
+                if(key) {
+                    (typeof key === "object" && Object.keys(key).length > 0) ?
+                    params.AttributeUpdates[key] = {
+                        Action: UpdateAttributes[key].action, 
+                        Value: UpdateAttributes[key].value
+                    }
+                    :
+                    params.AttributeUpdates[key] = {Action: "PUT", Value: UpdateAttributes[key]}
+                }
             }
-            :
-            params.AttributeUpdates[key] = {Action: "PUT", Value: UpdateAttributes[key]}
         );
         return this.DDB.update(params).promise();
     }
@@ -64,19 +68,23 @@ module.exports = class dynamoDB {
             let params = {
                 TableName,
                 Key: Item.Key,
-                AttributeUpdates,
+                AttributeUpdates: {},
                 Expected: Item.Expected && {
                     ComparisonOperator: Item.Expected.operator, 
                     AttributeValueList: Array.isArray(Item.Expected.value) ? [Item.Expected.value] : [[Item.Expected.value]]
                 }
             };
-            Object.keys(Item.UpdateAttributes).forEach(key => (typeof key === "object" && Object.keys(key).length > 0) ?
-                params.AttributeUpdates[key] = {
-                    Action: Item.UpdateAttributes[key].action, 
-                    Value: Item.UpdateAttributes[key].value
+            Object.keys(Item.UpdateAttributes).forEach(key => {
+                    if(Item.UpdateAttributes[key]) {
+                        (typeof key === "object" && Object.keys(key).length > 0) ?
+                        params.AttributeUpdates[key] = {
+                            Action: Item.UpdateAttributes[key].action, 
+                            Value: Item.UpdateAttributes[key].value
+                        }
+                        :
+                        params.AttributeUpdates[key] = {Action: "PUT", Value: Item.UpdateAttributes[key]}
+                    }
                 }
-                :
-                params.AttributeUpdates[key] = {Action: "PUT", Value: Item.UpdateAttributes[key]}
             );
             return this.DDB.update(params).promise();
         }))
@@ -95,13 +103,11 @@ module.exports = class dynamoDB {
             params.KeyConditions[key] = {ComparisonOperator: "EQ", AttributeValueList: [primaryKey[key]]}
         );
         if(settings) {
-            if(settings.index) params.IndexName = settings.index;
+            if(settings.index) params.Index = settings.index;
             if(settings.limit) params.Limit = settings.limit;
             if(settings.startKey) params.ExclusiveStartKey = settings.startKey;
             if(settings.forward) params.ScanIndexForward = settings.forward;
             if(settings.attributes) params.AttributesToGet = settings.attributes;
-            if(settings.condition) params.ConditionalOperator = settings.condition;
-            if(settings.consistent) params.ConsistentRead = settings.consistent;
         }
         return this.DDB.query(params).promise().then(r => r.Items);
     }
